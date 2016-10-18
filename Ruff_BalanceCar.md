@@ -90,7 +90,7 @@ PID（比例-积分-微分）控制算法是工程上最常用的自动控制算
 
 平衡车内部有两个反馈环，一个是由陀螺仪反馈姿态倾角和角速度构成的**直立环**，一个是由编码器反馈直流电机转速构成的**速度环**，由此构成一个串级PID控制系统（见下图），速度环控制的输出作为直立环控制的输入，直立环由**PD控制**（比例-微分控制）系统构成，保证小车的基本平衡（参数P的作用）和避免震荡（参数D的作用），速度环由**PI控制**（比例-积分控制）系统，消除姿态倾角的静差（参数I的作用）
 
-![control_block](https://raw.githubusercontent.com/young-mu/RuffAC/master/control_block.png)
+![control_block](https://raw.githubusercontent.com/young-mu/RuffAC/master/res/control_block.png)
 
 > 具体PID算法的原理及推导过程请参考自控控制专业书籍，这里只对算法作用和各个参数的意义进行简要说明
 
