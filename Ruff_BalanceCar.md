@@ -27,9 +27,9 @@ Ruff MCU开发版（tm4c1294-v1）
 
 3. 编码器模块（随直流电机一体）（MG513-30）
 
-![mg512-30_1](https://raw.githubusercontent.com/young-mu/RuffAC/master/res/mg512-30_1.jpg)
+![mg513-30_1](https://raw.githubusercontent.com/young-mu/RuffAC/master/res/mg513-30_1.jpg)
 
-![mg512-30_2](https://raw.githubusercontent.com/young-mu/RuffAC/master/res/mg512-30_2.jpg)
+![mg513-30_2](https://raw.githubusercontent.com/young-mu/RuffAC/master/res/mg513-30_2.jpg)
 
 > MG513-30是该直流电机的型号，由电机驱动模块进行驱动，这里我们用它自带的编码器模块
 
