@@ -45,8 +45,8 @@ Ruff MCU开发版（tm4c1294-v1）
 
 3. 电压转换模块（12V-5V）
 
-![12v-5v](https://raw.githubusercontent.com/young-mu/RuffAC/master/res/12v_5v.jpg)
-   
+![12v-5v](https://raw.githubusercontent.com/young-mu/RuffAC/master/res/12v-5v.jpg)
+
 > 直流电机12V供电，开发板5V供电
 
 ## 开发步骤
