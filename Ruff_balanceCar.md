@@ -11,23 +11,42 @@
 
 Ruff MCU开发版（tm4c1294-v1）
 
+![ControlBlock](https://raw.githubusercontent.com/young-mu/RuffAC/master/res/tm4c1294.jpg)
+
 > 开发板型号为TI TM4C1294-LaunchPad
 
 ### 传感器及执行元件
 
 1. 陀螺仪模块 （GY-521）
+
+![gy-521](https://raw.githubusercontent.com/young-mu/RuffAC/master/res/gy-521.jpg)
+
 2. 直流电机驱动模块 （TB6612FNG）
+
+![tb6612fng](https://raw.githubusercontent.com/young-mu/RuffAC/master/res/tb6612fng.jpg)
+
 3. 编码器模块（随直流电机一体）（MG513-30）
+
+![mg512-30_1](https://raw.githubusercontent.com/young-mu/RuffAC/master/res/mg512-30_1.jpg)
+
+![mg512-30_2](https://raw.githubusercontent.com/young-mu/RuffAC/master/res/mg512-30_2.jpg)
 
 > MG513-30是该直流电机的型号，由电机驱动模块进行驱动，这里我们用它自带的编码器模块
 
 ### 其它
 
-1. 轮胎x2
-2. 车身底盘
-3. 12V锂电池
-4. 12-5电压转换模块
+1. 机械元件
 
+![mechanicals](https://raw.githubusercontent.com/young-mu/RuffAC/master/res/mechanicals.jpg)
+
+2. 12V锂电池
+
+![12v_battery](https://raw.githubusercontent.com/young-mu/RuffAC/master/res/12v_battery.jpg)
+
+3. 电压转换模块（12V-5V）
+
+![12v-5v](https://raw.githubusercontent.com/young-mu/RuffAC/master/res/12v_5v.jpg)
+   
 > 直流电机12V供电，开发板5V供电
 
 ## 开发步骤
@@ -71,7 +90,7 @@ PID（比例-积分-微分）控制算法是工程上最常用的自动控制算
 
 平衡车内部有两个反馈环，一个是由陀螺仪反馈姿态倾角和角速度构成的**直立环**，一个是由编码器反馈直流电机转速构成的**速度环**，由此构成一个串级PID控制系统（见下图），速度环控制的输出作为直立环控制的输入，直立环由**PD控制**（比例-微分控制）系统构成，保证小车的基本平衡（参数P的作用）和避免震荡（参数D的作用），速度环由**PI控制**（比例-积分控制）系统，消除姿态倾角的静差（参数I的作用）
 
-![ControlBlock](https://raw.githubusercontent.com/young-mu/RuffAC/master/control_block.png)
+![control_block](https://raw.githubusercontent.com/young-mu/RuffAC/master/control_block.png)
 
 > 具体PID算法的原理及推导过程请参考自控控制专业书籍，这里只对算法作用和各个参数的意义进行简要说明
 
@@ -190,7 +209,7 @@ $.ready(function(error) {
 
 #### 开发效率
 
-1. Ruff作为一个嵌入式操作系统，对上跨开发平台，即在Windows/Linux/Mac都可以进行开发，不需要安装交叉编译工具或者指定版本的IDE
+1. Ruff作为一个IOT操作系统，对上跨开发平台，即在Windows/Linux/Mac都可以进行开发，不需要安装交叉编译工具或者指定版本的IDE
 2. Ruff SDK中rap生产力工具快速实现代码部署，驱动/软件包的安装
 3. Ruff Registry软件仓库包含嵌入式开发常用的各种模块驱动，随拿随用，若没有某个模块的驱动，Ruff提供常用接口驱动（如GPIO/I2C/UART/PWM/ADC/QEI等），可根据这些接口驱动，迅速开发驱动，并可发布到软件仓库中
 
