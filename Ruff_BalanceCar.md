@@ -9,23 +9,21 @@
 
 ### 主控平台
 
-Ruff MCU开发版（tm4c1294-v1）
+Ruff MCU开发版 （型号TM4C1294-V1）
 
-![ControlBlock](https://raw.githubusercontent.com/young-mu/RuffAC/master/res/tm4c1294.jpg)
-
-> 开发板型号为TI TM4C1294-LaunchPad
+![tm4c1294](https://raw.githubusercontent.com/young-mu/RuffAC/master/res/tm4c1294.jpg)
 
 ### 传感器及执行元件
 
-1. 陀螺仪模块 （GY-521）
+- 陀螺仪模块 （型号GY-521）
 
 ![gy-521](https://raw.githubusercontent.com/young-mu/RuffAC/master/res/gy-521.jpg)
 
-2. 直流电机驱动模块 （TB6612FNG）
+- 直流电机驱动模块 （型号TB6612FNG）
 
 ![tb6612fng](https://raw.githubusercontent.com/young-mu/RuffAC/master/res/tb6612fng.jpg)
 
-3. 编码器模块（随直流电机一体）（MG513-30）
+- 编码器模块（随直流电机一体）（型号MG513-30）
 
 ![mg513-30_1](https://raw.githubusercontent.com/young-mu/RuffAC/master/res/mg513-30_1.jpg)
 
@@ -35,15 +33,15 @@ Ruff MCU开发版（tm4c1294-v1）
 
 ### 其它
 
-1. 机械元件
+- 机械元件
 
 ![mechanicals](https://raw.githubusercontent.com/young-mu/RuffAC/master/res/mechanicals.jpg)
 
-2. 12V锂电池
+- 12V锂电池
 
 ![12v_battery](https://raw.githubusercontent.com/young-mu/RuffAC/master/res/12v_battery.jpg)
 
-3. 电压转换模块（12V-5V）
+- 电压转换模块（12V-5V）
 
 ![12v-5v](https://raw.githubusercontent.com/young-mu/RuffAC/master/res/12v-5v.jpg)
 
@@ -51,7 +49,7 @@ Ruff MCU开发版（tm4c1294-v1）
 
 ## 开发步骤
 
-##### 1. 初始化APP，选择tm4c1294-v1开发板（对应TM4C1294-LaunchPad）
+##### 1. 初始化APP，选择tm4c1294-v1开发板（对应TI TM4C1294-LaunchPad）
 ```bash
 $ rap init --board tm4c1294-v1
 ```
@@ -72,9 +70,12 @@ $ rap device add encoder (MG513-30)
 ```
 
 ##### 5. 编写控制算法
-(见下文）
+（见下文）
 
-##### 6. 扫描开发板
+##### 6. 调试
+（见下文）
+
+##### 7. 扫描开发板
 ```bash
 $ rap scan
 ```
@@ -105,9 +106,9 @@ $.ready(function(error) {
         return;
     }
 
-    var gyro = $('#gyro'); // 陀螺仪设备
-    var motor = $('#motor'); // 电机驱动设备
-    var enc = $('#encoder'); // 编码器设备
+    var gyro = $('#gyro'); // 陀螺仪传感器（GY-521）
+    var enc = $('#encoder'); // 编码器传感器（MG513-30）
+    var motor = $('#motor'); // 电机驱动控制器（TB6612FNG）
 
     // 直立环PD控制
     var getBalancePwm = function (actualAngle, actualGyro) {
@@ -133,11 +134,11 @@ $.ready(function(error) {
         sumEncoder += encoder;
 
         // 积分限幅
-        if (sumEncoder >= 1000) {
-            sumEncoder = 1000;
+        if (sumEncoder >= 3000) {
+            sumEncoder = 3000;
         }
-        if (sumEncoder <= -1000) {
-            sumEncoder = -1000;
+        if (sumEncoder <= -3000) {
+            sumEncoder = -3000;
         }
 
         // 速度换控制分量
@@ -189,8 +190,8 @@ $.ready(function(error) {
             motor.forwardRotateB(-pwmDuty);
         }
 
-        // 若倾角超过20度，停止整个控制系统运行
-        if (angleX >= 20 || angleX <= -20) {
+        // 若倾角超过30度，停止整个控制系统运行
+        if (angleX >= 30 || angleX <= -30) {
             // 停止陀螺仪采样
             clearInterval(gyroAcquire);
             // 停止编码器采样
@@ -205,28 +206,32 @@ $.ready(function(error) {
 });
 ```
 
-## Ruff MCU与常规MCU开发的区别
+## 调试
 
-#### 开发效率
+### 目标角度调试
 
-1. Ruff作为一个IOT操作系统，对上跨开发平台，即在Windows/Linux/Mac都可以进行开发，不需要安装交叉编译工具或者指定版本的IDE
-2. Ruff SDK中rap生产力工具快速实现代码部署，驱动/软件包的安装
-3. Ruff Registry软件仓库包含嵌入式开发常用的各种模块驱动，随拿随用，若没有某个模块的驱动，Ruff提供常用接口驱动（如GPIO/I2C/UART/PWM/ADC/QEI等），可根据这些接口驱动，迅速开发驱动，并可发布到软件仓库中
+装好整个机械元件后，要进行目标角度调试，即targetAngle变量，具体方法，将控制motor前后转动的代码全部注释掉，然后在balanceControl这个函数中，打印angleX，得到小车趋于平衡静止时的角度，应该大约在正负3度以内。
 
-#### 可移植性
+### 算法参数调试
 
-Ruff作为一个嵌入式操作系统，对下跨硬件平台（可以运行在任何开发板/芯片/架构上），而设备驱动逻辑（如本案列使用的GY-521等）由Javascript编写，天生具备跨平台能力，因此代码具有可复用性
+首先确定参数的极性。
+
+先屏蔽掉外反馈环PI控制，保持kP和kD参数不变，看是否小车有平衡的趋势，及车轮是否会向倾倒的一侧转动，若是，则kP和kD参数为正数不需要改变，若否，则kP和kI参数需要改为负数。
+
+之后屏蔽掉内反馈环PD控制，保持kI和kD参数不变，用手去转动连接编码器的那个车轮，看是否是此PI控制是正反馈，即给车轮一个小的转动，车轮是否会一直加速到最大速度，若是，则kP和kD参数为正数不需要改变，若否，则kP和kI参数需要改为负数（上述程序中只需要改kP即可，kI为kP/200）。
+
+然后确定参数的数值。一般情况下，整个机械元件装稳定后，PD算法参数（kP和kD）和PI算法中的参数（kP和kI）应该不需要变动就可以直接运行在你的平衡小车上。
 
 ## FAQ
 
 > Q: Ruff MPU版（ruff-mbd-v1）可以作为主控平台么？
 
-A: 不能，因为底层的OpenWRT（基于Linux）不是实时操作系统，系统启动后会运行很多进程，Ruff进程不一定时刻占有CPU，因此不能稳定地每隔一个控制周期（比如20ms）获得传感器数据，不满足控制系统的实时性要求。而MCU版Ruff的底层操作系统是Nuttx RTOS，能够保证实时操作
+A: 不能，因为底层的OpenWRT（基于Linux）不是实时操作系统，系统启动后会运行很多进程，Ruff进程不一定时刻占有CPU，因此不能稳定地每隔一个控制周期（这里是20ms）获得传感器数据，不满足控制系统的实时性要求。而MCU版Ruff的底层操作系统是Nuttx RTOS，能够保证实时操作。
 
 > Q: 控制系统中控制周期是多少？
 
-A: 控制周期为20ms，即1秒内控制系统控制50次
+A: 控制周期为20ms，即1秒内控制系统控制50次。每个控制周期需要做的内容包括 1) 获取陀螺仪和编码器两个传感器的数据，2) 传入直立环和速度环算法中进行计算得到控制量，3) 将控制量作用于直流电机上。
 
-> Q: 用Ruff MCU开发板开发平衡车与用其它开发板（如stm32的开发板）开发，有什么相同点与不同点？
+> Q: 用Ruff MCU开发板开发平衡车与用其它开发板（如stm32的开发板）进行裸板开发，有什么相同点与不同点？
 
-A: 相同点是都满足实时性控制的要求（如本案例的20ms控制周期），不同点在前文已经说过，主要体现在开发效率和可移植性两个方面，用其它开发板开发，要面对各种接口协议，模块协议等其它问题，且代码不具备可移植性和复用性，但用Ruff开发，直面控制算法逻辑，而不用关心硬件模块的任何细节，正因为没有任何硬件平台的逻辑，程序本身具备可复用性
+A: 相同点是都满足实时性控制的要求（如本案例的20ms控制周期）。不同点主要体现在**开发效率**和**可移植性**两个方面，若用其它MCU开发板进行裸板开发，要面对**硬件接口协议**（I2C接口陀螺仪，QEI接口编码器，PWM和GPIO接口的直流电机控制器），**外设模块协议**（比如给陀螺仪发送什么命令获取到加速度值和角速度值）和**硬件定时器中断**（通过配置寄存器设置20ms定时器中断）等其它问题，且代码不具备可移植性和复用性，但在整个开发过程中若用Ruff开发，可直面业务逻辑，即自动控制算法，而不用关心硬件模块的任何细节，你面对的只有外设模块的API，并且由于没有任何硬件平台的逻辑，程序本身具备可复用性。
